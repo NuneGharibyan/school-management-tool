@@ -23,12 +23,12 @@ async function startServer() {
   // Start Apollo Server
   await server.start();
 
-  // Apply middleware
-  server.applyMiddleware({ app });
-
   // Middleware
   app.use(express.json());
   app.use(authenticate);
+
+  // Apply middleware
+  server.applyMiddleware({ app });
 
   // Start Express server
   app.listen({ port: 4000 }, () =>

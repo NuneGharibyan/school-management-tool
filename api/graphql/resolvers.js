@@ -1,97 +1,110 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const SECRET_KEY = process.env.SECRET_KEY || "your-secret-key";
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const resolvers = {
   Query: {
-    // me: async (_, __, { prisma, user }) => {
-    //   if (!user) throw new Error("Not authenticated");
-    //   return await prisma.user.findUnique({ where: { id: user.id } });
-    // },
-    teachers: (_, __, { prisma }) => prisma.teacher.findMany(),
-    pupils: (_, __, { prisma }) => prisma.pupil.findMany(),
-    subjects: (_, __, { prisma }) => prisma.subject.findMany(),
+    getTeachers: () => {
+      return prisma.teacher.findMany();
+    },
+    getPupils: () => {
+      return prisma.pupil.findMany();
+    },
+    getSubjects: () => {
+      return prisma.subject.findMany();
+    },
   },
+
   Mutation: {
-    login: async (_, { email, password }, { prisma }) => {
-      const user = await prisma.user.findUnique({ where: { email } });
-
-      if (!user || !(await bcrypt.compare(password, user.password))) {
-        throw new Error("Invalid credentials");
+    // Admin login
+    login: async (_, { email, password }) => {
+      const admin = await prisma.admin.findUnique({ where: { email } });
+      if (!admin) {
+        throw new Error("Admin not found");
       }
-
-      return jwt.sign({ id: user.id, role: user.role }, SECRET_KEY, {
+      const valid = await bcrypt.compare(password, admin.password);
+      if (!valid) {
+        throw new Error("Incorrect password");
+      }
+      const token = jwt.sign({ adminId: admin.id }, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
+      return token;
     },
-    createTeacher: async (_, { name }, { prisma, user }) => {
-      //   if (!user || user.role !== "ADMIN") throw new Error("Not authorized");
 
-      return await prisma.teacher.create({
-        data: {
-          name,
-          email: `${name}@example.com`,
-          password: "password",
-        },
-      });
+    // CRUD for Teacher
+    addTeacher: (_, { name }) => {
+      return prisma.teacher.create({ data: { name } });
     },
-    createPupil: async (_, { name, grade }, { prisma, user }) => {
-      if (!user || user.role !== "ADMIN") throw new Error("Not authorized");
-
-      return await prisma.pupil.create({
-        data: {
-          name,
-          grade,
-          user: {
-            create: {
-              email: `${name}@example.com`,
-              password: "password",
-              role: "PUPIL",
-            },
-          },
-        },
-      });
-    },
-    createSubject: async (_, { name, grade }, { prisma }) => {
-      return await prisma.subject.create({
-        data: { name, grade },
-      });
-    },
-    updateTeacher: async (_, { id, name }, { prisma, user }) => {
-      if (!user || user.role !== "ADMIN") throw new Error("Not authorized");
-      return await prisma.teacher.update({
-        where: { id },
+    editTeacher: (_, { id, name }) => {
+      return prisma.teacher.update({
+        where: { id: parseInt(id) },
         data: { name },
       });
     },
-    updatePupil: async (_, { id, name, grade }, { prisma, user }) => {
-      if (!user || user.role !== "ADMIN") throw new Error("Not authorized");
-      return await prisma.pupil.update({
-        where: { id },
+    deleteTeacher: (_, { id }) => {
+      return prisma.teacher.delete({ where: { id: parseInt(id) } });
+    },
+
+    // CRUD for Pupil
+    addPupil: (_, { name, grade }) => {
+      return prisma.pupil.create({ data: { name, grade } });
+    },
+    editPupil: (_, { id, name, grade }) => {
+      return prisma.pupil.update({
+        where: { id: parseInt(id) },
         data: { name, grade },
       });
     },
-    updateSubject: async (_, { id, name, grade }, { prisma }) => {
-      return await prisma.subject.update({
-        where: { id },
-        data: { name, grade },
+    deletePupil: (_, { id }) => {
+      return prisma.pupil.delete({ where: { id: parseInt(id) } });
+    },
+
+    // CRUD for Subject
+    addSubject: (_, { name, teacherId }) => {
+      return prisma.subject.create({
+        data: {
+          name,
+          teacher: { connect: { id: parseInt(teacherId) } },
+        },
       });
     },
-    deleteTeacher: async (_, { id }, { prisma, user }) => {
-      if (!user || user.role !== "ADMIN") throw new Error("Not authorized");
-      return await prisma.teacher.delete({
-        where: { id },
+    editSubject: (_, { id, name, teacherId }) => {
+      return prisma.subject.update({
+        where: { id: parseInt(id) },
+        data: {
+          name,
+          teacher: { connect: { id: parseInt(teacherId) } },
+        },
       });
     },
-    deletePupil: async (_, { id }, { prisma, user }) => {
-      if (!user || user.role !== "ADMIN") throw new Error("Not authorized");
-      return await prisma.pupil.delete({
-        where: { id },
+    deleteSubject: (_, { id }) => {
+      return prisma.subject.delete({ where: { id: parseInt(id) } });
+    },
+  },
+
+  Teacher: {
+    subjects: (parent) => {
+      return prisma.subject.findMany({ where: { teacherId: parent.id } });
+    },
+  },
+
+  Pupil: {
+    subjects: (parent) => {
+      return prisma.subject.findMany({
+        where: { pupils: { some: { id: parent.id } } },
       });
     },
-    deleteSubject: async (_, { id }, { prisma }) => {
-      return await prisma.subject.delete({
-        where: { id },
+  },
+
+  Subject: {
+    teacher: (parent) => {
+      return prisma.teacher.findUnique({ where: { id: parent.teacherId } });
+    },
+    pupils: (parent) => {
+      return prisma.pupil.findMany({
+        where: { subjects: { some: { id: parent.id } } },
       });
     },
   },

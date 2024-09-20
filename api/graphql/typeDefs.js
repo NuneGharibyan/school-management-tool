@@ -1,71 +1,50 @@
 const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
-  enum Role {
-    ADMIN
-    TEACHER
-    PUPIL
+  type Admin {
+    id: ID!
+    email: String!
   }
 
   type Teacher {
-    id: Int!
+    id: ID!
     name: String!
-    email: String!
     subjects: [Subject!]!
   }
 
   type Pupil {
-    id: Int!
+    id: ID!
     name: String!
     grade: Int!
-    email: String!
     subjects: [Subject!]!
   }
 
   type Subject {
-    id: Int!
+    id: ID!
     name: String!
-    grade: Int!
-    teachers: [Teacher!]!
+    teacher: Teacher!
     pupils: [Pupil!]!
   }
 
   type Query {
-    teachers: [Teacher!]!
-    pupils: [Pupil!]!
-    subjects: [Subject!]!
+    getTeachers: [Teacher!]!
+    getPupils: [Pupil!]!
+    getSubjects: [Subject!]!
   }
 
   type Mutation {
-    login(email: String!, password: String!): String
+    login(email: String!, password: String!): String!
+    addTeacher(name: String!): Teacher!
+    editTeacher(id: ID!, name: String!): Teacher!
+    deleteTeacher(id: ID!): Boolean!
 
-    createTeacher(name: String!): Teacher
-    updateTeacher(
-      id: Int!
-      name: String
-      email: String
-      password: String
-    ): Teacher
-    deleteTeacher(id: Int!): Teacher
+    addPupil(name: String!, grade: Int!): Pupil!
+    editPupil(id: ID!, name: String!, grade: Int!): Pupil!
+    deletePupil(id: ID!): Boolean!
 
-    createPupil(
-      name: String!
-      grade: Int!
-      email: String!
-      password: String!
-    ): Pupil
-    updatePupil(
-      id: Int!
-      name: String
-      grade: Int
-      email: String
-      password: String
-    ): Pupil
-    deletePupil(id: Int!): Pupil
-
-    createSubject(name: String!, grade: Int!): Subject
-    updateSubject(id: Int!, name: String, grade: Int): Subject
-    deleteSubject(id: Int!): Subject
+    addSubject(name: String!, teacherId: ID!): Subject!
+    editSubject(id: ID!, name: String!, teacherId: ID!): Subject!
+    deleteSubject(id: ID!): Boolean!
   }
 `;
 

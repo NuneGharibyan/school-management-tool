@@ -7,33 +7,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Admin {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
+}
+
 model Teacher {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String    @unique
-  password  String
-  subjects  Subject[] @relation("TeacherSubjects")
+  id       Int       @id @default(autoincrement())
+  name     String
+  subjects Subject[]
 }
 
 model Pupil {
-  id        Int       @id @default(autoincrement())
-  name      String
-  grade     Int
-  email     String    @unique
-  password  String
-  subjects  Subject[] @relation("PupilSubjects")
+  id       Int       @id @default(autoincrement())
+  name     String
+  grade    Int
+  subjects Subject[]
 }
 
 model Subject {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String
-  grade     Int
-  teachers  Teacher[] @relation("TeacherSubjects")
-  pupils    Pupil[]   @relation("PupilSubjects")
-}
-
-enum Role {
-  ADMIN
-  TEACHER
-  PUPIL
+  teacherId Int
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  pupils    Pupil[]
 }
