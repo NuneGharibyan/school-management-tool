@@ -2,10 +2,36 @@ import { gql } from "@apollo/client";
 
 export const GET_TEACHERS = gql`
   query GetTeachers {
-    teachers {
+    getTeachers {
       id
       name
-      email
+      subjects {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const GET_SUBJECTS = gql`
+  query GetSubjects {
+    getSubjects {
+      id
+      name
+      teacher {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const GET_PUPILS = gql`
+  query GetPupils {
+    getPupils {
+      id
+      name
+      grade
     }
   }
 `;
