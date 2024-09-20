@@ -14,10 +14,6 @@ async function startServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: ({ req }) => ({
-      prisma,
-      user: req.user,
-    }),
   });
 
   // Start Apollo Server
