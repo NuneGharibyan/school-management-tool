@@ -1,6 +1,12 @@
 import { useQuery } from "@apollo/client";
 import { GET_PUPILS } from "../../client/queries";
-import TableComponent from "../table/Table";
+import Table from "../table/Table";
+
+interface IPupil {
+  id: string;
+  name: string;
+  grade: number;
+}
 
 const columns = [
   { label: "ID", key: "id" },
@@ -17,7 +23,7 @@ const PupilsTable: React.FC = () => {
   return (
     <div>
       <h1>Pupils</h1>
-      <TableComponent columns={columns} data={data.getPupils} />
+      <Table<IPupil> columns={columns} data={data.getPupils} />
     </div>
   );
 };

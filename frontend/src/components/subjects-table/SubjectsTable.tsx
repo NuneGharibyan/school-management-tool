@@ -1,10 +1,24 @@
 import { useQuery } from "@apollo/client";
 import { GET_SUBJECTS } from "../../client/queries";
-import TableComponent from "../table/Table";
+import Table from "../table/Table";
+
+interface ISubject {
+  id: string;
+  name: string;
+  teacher: {
+    id: string;
+    name: string;
+  };
+}
 
 const columns = [
   { label: "ID", key: "id" },
   { label: "Name", key: "name" },
+  {
+    label: "Teacher",
+    key: "teacher",
+    renderer: (subject: ISubject) => subject.teacher.name,
+  },
 ];
 
 const SubjectsTable: React.FC = () => {
@@ -16,7 +30,7 @@ const SubjectsTable: React.FC = () => {
   return (
     <div>
       <h1>Subjects</h1>
-      <TableComponent columns={columns} data={data.getSubjects} />
+      <Table<ISubject> columns={columns} data={data.getSubjects} />
     </div>
   );
 };

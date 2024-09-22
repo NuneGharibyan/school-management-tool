@@ -1,28 +1,36 @@
 import {
+  Table as MUITable,
   Paper,
-  Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
 } from "@mui/material";
-import React from "react";
+import { ReactElement } from "react";
 
-interface Column {
+interface IColumn<T> {
   label: string;
   key: string;
+  renderer?: (data: T) => ReactElement | string;
 }
 
-interface TableComponentProps {
-  columns: Column[];
-  data: { [key: string]: any }[];
+interface ITableProps<T> {
+  columns: IColumn<T>[];
+  data: T[];
 }
 
-const TableComponent: React.FC<TableComponentProps> = ({ columns, data }) => {
+const Table = <T extends { [key: string]: any }>({
+  columns,
+  data,
+}: ITableProps<T>) => {
+  const renderCell = (data: T, column: IColumn<T>): ReactElement => {
+    return column.renderer ? column.renderer(data) : data[column.key];
+  };
+
   return (
     <TableContainer component={Paper}>
-      <Table>
+      <MUITable>
         <TableHead>
           <TableRow>
             {columns.map((column) => (
@@ -33,19 +41,19 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns, data }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row, rowIndex) => (
+          {data.map((row: T, rowIndex) => (
             <TableRow key={rowIndex}>
               {columns.map((column, colIndex) => (
                 <TableCell key={colIndex} align="center">
-                  {row[column.key]}
+                  {renderCell(row, column)}
                 </TableCell>
               ))}
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </MUITable>
     </TableContainer>
   );
 };
 
-export default TableComponent;
+export default Table;

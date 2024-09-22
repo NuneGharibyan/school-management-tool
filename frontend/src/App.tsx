@@ -8,7 +8,7 @@ import { TeachersTable } from "./components/teachers-table/TeachersTable";
 function App() {
   return (
     <ApolloProvider client={client}>
-      <div>
+      <div style={{ margin: "35px" }}>
         <TeachersTable />
         <SubjectsTable />
         <PupilsTable />
