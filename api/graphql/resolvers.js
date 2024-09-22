@@ -19,18 +19,51 @@ const resolvers = {
   Mutation: {
     // Admin login
     login: async (_, { email, password }) => {
-      const admin = await prisma.admin.findUnique({ where: { email } });
+      const admin = await prisma.admin.findUnique({
+        where: { email },
+      });
+
       if (!admin) {
         throw new Error("Admin not found");
       }
+
       const valid = await bcrypt.compare(password, admin.password);
+
       if (!valid) {
-        throw new Error("Incorrect password");
+        throw new Error("Invalid credentials");
       }
-      const token = jwt.sign({ adminId: admin.id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
+
+      const token = jwt.sign({ adminId: admin.id }, process.env.JWT_SECRET);
+
+      return {
+        token,
+        admin,
+      };
+    },
+
+    // Sign-Up Mutation
+    signUp: async (_, { email, password }) => {
+      const existingAdmin = await prisma.admin.findUnique({
+        where: { email },
       });
-      return token;
+
+      if (existingAdmin) {
+        throw new Error("Admin already exists with this email");
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const admin = await prisma.admin.create({
+        data: {
+          email,
+          password: hashedPassword,
+        },
+      });
+      const token = jwt.sign({ adminId: admin.id }, process.env.JWT_SECRET);
+
+      return {
+        token,
+        admin,
+      };
     },
 
     // CRUD for Teacher

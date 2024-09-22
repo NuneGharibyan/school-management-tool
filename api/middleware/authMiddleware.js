@@ -1,18 +1,29 @@
 const jwt = require("jsonwebtoken");
-const SECRET_KEY = process.env.SECRET_KEY || "your-secret-key";
 
-function authenticate(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1];
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-  if (!token) return next();
+  const isSignUpMutation = req.body?.query?.includes("mutation SignUp");
+  const isLoginMutation = req.body?.query?.includes("mutation Login");
 
-  try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    req.user = decoded;
-  } catch (error) {
-    console.error("Invalid token");
+  if (isSignUpMutation || isLoginMutation) {
+    return next();
   }
-  next();
-}
+
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+
+      req.user = user;
+      next();
+    });
+  } else {
+    return res.sendStatus(401);
+  }
+};
 
 module.exports = authenticate;

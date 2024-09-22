@@ -32,8 +32,14 @@ const typeDefs = gql`
     getSubjects: [Subject!]!
   }
 
+  type AuthPayload {
+    token: String!
+    admin: Admin!
+  }
+
   type Mutation {
-    login(email: String!, password: String!): String!
+    signUp(email: String!, password: String!): AuthPayload!
+    login(email: String!, password: String!): AuthPayload!
     addTeacher(name: String!): Teacher!
     editTeacher(id: ID!, name: String!): Teacher!
     deleteTeacher(id: ID!): Boolean!

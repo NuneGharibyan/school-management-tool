@@ -1,20 +1,44 @@
 import { ApolloProvider } from "@apollo/client";
-import "./App.css";
+import React from "react";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
 import client from "./client/apollo-client";
-import { PupilsTable } from "./components/pupils-table/PupilsTable";
-import { SubjectsTable } from "./components/subjects-table/SubjectsTable";
-import { TeachersTable } from "./components/teachers-table/TeachersTable";
+import Dashboard from "./components/dashboard/Dashboard";
+import Login from "./components/login/Login";
+import SignUp from "./components/sign-up/SignUp";
 
-function App() {
+const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const isAuthenticated = !!localStorage.getItem("token");
+
+  return isAuthenticated ? <>{children}</> : <Navigate to="/signup" />;
+};
+
+const App: React.FC = () => {
   return (
     <ApolloProvider client={client}>
-      <div style={{ margin: "35px" }}>
-        <TeachersTable />
-        <SubjectsTable />
-        <PupilsTable />
-      </div>
+      <Router>
+        <Routes>
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/signup" />} />
+        </Routes>
+      </Router>
     </ApolloProvider>
   );
-}
+};
 
 export default App;
