@@ -70,11 +70,13 @@ const resolvers = {
     addTeacher: (_, { name }) => {
       return prisma.teacher.create({ data: { name } });
     },
-    editTeacher: (_, { id, name }) => {
-      return prisma.teacher.update({
-        where: { id: parseInt(id) },
+    editTeacher: async (_, { id, name }) => {
+      const updatedTeacher = await prisma.teacher.update({
+        where: { id: Number(id) },
         data: { name },
       });
+
+      return updatedTeacher;
     },
     deleteTeacher: (_, { id }) => {
       return prisma.teacher.delete({ where: { id: parseInt(id) } });
@@ -99,6 +101,8 @@ const resolvers = {
       return prisma.subject.create({
         data: {
           name,
+          //TODO: maybe add grade
+
           teacher: { connect: { id: parseInt(teacherId) } },
         },
       });

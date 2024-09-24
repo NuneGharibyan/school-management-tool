@@ -23,3 +23,29 @@ export const LOGIN_MUTATION = gql`
     }
   }
 `;
+
+export const UPDATE_TEACHER = gql`
+  mutation EditTeacher($id: ID!, $name: String!) {
+    editTeacher(id: $id, name: $name) {
+      id
+      name
+      subjects {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const UPDATE_SUBJECT = gql`
+  mutation EditSubject($id: ID!, $name: String!, $teacherId: ID!) {
+    editSubject(id: $id, name: $name, teacherId: $teacherId) {
+      id
+      name
+      teacher {
+        id
+        name
+      }
+    }
+  }
+`;

@@ -40,6 +40,7 @@ const typeDefs = gql`
   type Mutation {
     signUp(email: String!, password: String!): AuthPayload!
     login(email: String!, password: String!): AuthPayload!
+
     addTeacher(name: String!): Teacher!
     editTeacher(id: ID!, name: String!): Teacher!
     deleteTeacher(id: ID!): Boolean!

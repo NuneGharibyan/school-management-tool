@@ -1,12 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { GET_PUPILS } from "../../client/queries";
+import { IPupil } from "../../interfaces";
 import Table from "../table/Table";
-
-interface IPupil {
-  id: string;
-  name: string;
-  grade: number;
-}
 
 const columns = [
   { label: "ID", key: "id" },
