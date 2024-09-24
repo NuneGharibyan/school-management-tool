@@ -22,6 +22,7 @@ const typeDefs = gql`
   type Subject {
     id: ID!
     name: String!
+    grade: Int!
     teacher: Teacher!
     pupils: [Pupil!]!
   }
@@ -49,8 +50,8 @@ const typeDefs = gql`
     editPupil(id: ID!, name: String!, grade: Int!): Pupil!
     deletePupil(id: ID!): Boolean!
 
-    addSubject(name: String!, teacherId: ID!): Subject!
-    editSubject(id: ID!, name: String!, teacherId: ID!): Subject!
+    addSubject(name: String!, teacherId: ID!, grade: Int!): Subject!
+    editSubject(id: ID!, name: String!, teacherId: ID!, grade: Int!): Subject!
     deleteSubject(id: ID!): Boolean!
   }
 `;

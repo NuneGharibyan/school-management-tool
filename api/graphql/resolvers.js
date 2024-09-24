@@ -83,8 +83,21 @@ const resolvers = {
     },
 
     // CRUD for Pupil
-    addPupil: (_, { name, grade }) => {
-      return prisma.pupil.create({ data: { name, grade } });
+    addPupil: async (_, { name, grade }) => {
+      const subjects = await prisma.subject.findMany({
+        where: { grade },
+      });
+
+      return prisma.pupil.create({
+        data: {
+          name,
+          grade,
+          subjects: {
+            connect: subjects.map((subject) => ({ id: subject.id })),
+          },
+        },
+        include: { subjects: true },
+      });
     },
     editPupil: (_, { id, name, grade }) => {
       return prisma.pupil.update({
@@ -97,21 +110,21 @@ const resolvers = {
     },
 
     // CRUD for Subject
-    addSubject: (_, { name, teacherId }) => {
+    addSubject: (_, { name, teacherId, grade }) => {
       return prisma.subject.create({
         data: {
           name,
-          //TODO: maybe add grade
-
+          grade,
           teacher: { connect: { id: parseInt(teacherId) } },
         },
       });
     },
-    editSubject: (_, { id, name, teacherId }) => {
+    editSubject: (_, { id, name, teacherId, grade }) => {
       return prisma.subject.update({
         where: { id: parseInt(id) },
         data: {
           name,
+          grade,
           teacher: { connect: { id: parseInt(teacherId) } },
         },
       });

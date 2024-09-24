@@ -28,8 +28,8 @@ const UpdateSubjectDialog: React.FC<UpdateSubjectDialogProps> = ({
   subject,
 }) => {
   const [name, setName] = useState(subject.name);
+  const [grade, setGrade] = useState(subject.grade);
   const [teacherId, setTeacherId] = useState(subject.teacher.id);
-
   const { data: teachersData, refetch: refetchTeachers } =
     useQuery(GET_TEACHERS);
   const [updateSubject] = useMutation(UPDATE_SUBJECT, {
@@ -40,7 +40,9 @@ const UpdateSubjectDialog: React.FC<UpdateSubjectDialogProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateSubject({ variables: { id: subject.id, name, teacherId } });
+    await updateSubject({
+      variables: { id: subject.id, name, grade: Number(grade), teacherId },
+    });
     refetchTeachers();
   };
 
@@ -75,6 +77,15 @@ const UpdateSubjectDialog: React.FC<UpdateSubjectDialogProps> = ({
               )}
             </Select>
           </FormControl>
+          <TextField
+            margin="dense"
+            label="Grade"
+            type="number"
+            fullWidth
+            variant="outlined"
+            value={grade}
+            onChange={(e) => setGrade(parseInt(e.target.value))}
+          />
         </form>
       </DialogContent>
       <DialogActions>

@@ -15,6 +15,7 @@ const SubjectsTable: React.FC = () => {
     () => [
       { label: "ID", key: "id" },
       { label: "Name", key: "name" },
+      { label: "Grade", key: "grade" },
       {
         label: "Teacher",
         key: "teacher",

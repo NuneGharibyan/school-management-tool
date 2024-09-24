@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `subject` ADD COLUMN `grade` INTEGER NOT NULL DEFAULT 1;

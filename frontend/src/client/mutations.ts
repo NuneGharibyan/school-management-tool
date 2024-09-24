@@ -38,10 +38,16 @@ export const UPDATE_TEACHER = gql`
 `;
 
 export const UPDATE_SUBJECT = gql`
-  mutation EditSubject($id: ID!, $name: String!, $teacherId: ID!) {
-    editSubject(id: $id, name: $name, teacherId: $teacherId) {
+  mutation EditSubject(
+    $id: ID!
+    $name: String!
+    $teacherId: ID!
+    $grade: Int!
+  ) {
+    editSubject(id: $id, name: $name, teacherId: $teacherId, grade: $grade) {
       id
       name
+      grade
       teacher {
         id
         name
